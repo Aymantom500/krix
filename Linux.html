@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المقرر الشامل لسطر أوامر لينكس: من الصفر إلى الاحتراف</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #4a4a6a;
+            --primary: #0d6efd;
+            --primary-light: #e7f1ff;
+            --accent: #00b4d8;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: #cbd5e1;
+            --sidebar-active: #0d6efd;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.85;
+            display: flex;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 300px;
+            min-width: 300px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            padding: 24px 16px;
+            font-size: 0.9rem;
+            border-left: 1px solid #1e293b;
+            z-index: 100;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+        .sidebar h2 {
+            color: #ffffff;
+            font-size: 1.15rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #1e293b;
+            padding-bottom: 14px;
+        }
+        .sidebar .level-title {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 16px 0 6px 0;
+            padding: 0 8px;
+            font-weight: 700;
+        }
+        .sidebar a {
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            font-size: 0.85rem;
+            margin: 2px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sidebar a:hover {
+            background: #1e293b;
+            color: #ffffff;
+        }
+        .sidebar a.active {
+            background: var(--sidebar-active);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* MAIN */
+        .main-content {
+            flex: 1;
+            padding: 32px 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .main-content h1 {
+            font-size: 2.2rem;
+            color: #0f172a;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .main-content .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 32px;
+            border-bottom: 3px solid var(--border);
+            padding-bottom: 20px;
+        }
+        .main-content h2 {
+            font-size: 1.6rem;
+            color: #0f172a;
+            margin-top: 40px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+        }
+        .main-content h3 {
+            font-size: 1.25rem;
+            color: #1a1a2e;
+            margin-top: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .main-content h4 {
+            font-size: 1.05rem;
+            color: #334155;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        /* CODE BLOCK */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 18px 20px;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin: 14px 0;
+            direction: ltr;
+            text-align: left;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            border: 1px solid #334155;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+            font-family: inherit;
+            color: inherit;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85em;
+            color: #1e293b;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* EXERCISE BOX */
+        .exercise-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+        }
+        .exercise-box h4 {
+            color: #b45309;
+            margin-top: 0;
+            font-weight: 700;
+        }
+        .exercise-box ol,
+        .exercise-box ul {
+            margin-right: 20px;
+            color: #78350f;
+        }
+        .exercise-box li {
+            margin: 6px 0;
+        }
+
+        /* NOTE BOX */
+        .note-box {
+            background: var(--primary-light);
+            border-right: 5px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin: 16px 0;
+            color: #1e3a5f;
+        }
+        .note-box strong {
+            color: #0d6efd;
+        }
+
+        /* INLINE HIGHLIGHT */
+        .highlight {
+            background: #fef9c3;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .path {
+            color: #0d6efd;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* TABLE OF CONTENTS FLOATING */
+        .toc-mini {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow);
+        }
+        .toc-mini summary {
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1.05rem;
+            color: #0f172a;
+        }
+        .toc-mini ul {
+            margin-top: 10px;
+            list-style: none;
+            columns: 2;
+            column-gap: 20px;
+        }
+        .toc-mini li {
+            margin: 4px 0;
+        }
+        .toc-mini a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .toc-mini a:hover {
+            text-decoration: underline;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                padding: 20px 16px;
+                max-width: 100%;
+            }
+            .toc-mini ul {
+                columns: 1;
+            }
+            pre {
+                font-size: 0.78rem;
+                padding: 12px;
+            }
+        }
+        @media (min-width: 901px) {
+            .toc-mini {
+                display: none;
+            }
+        }
+
+        /* SMOOTH SCROLL HIGHLIGHT */
+        section:target {
+            animation: highlightSection 1.5s ease-out;
+        }
+        @keyframes highlightSection {
+            0% {
+                background-color: #fef9c3;
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+        section {
+            scroll-margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <h2>📋 فهرس المقرر</h2>
+        <div class="level-title">📌 قبل أن تبدأ</div>
+        <a href="#preface">تجهيز البيئة</a>
+        <div class="level-title">🔰 المستوى الأول</div>
+        <a href="#l1">الدرس 1: الشيل والطرفية</a>
+        <a href="#l2">الدرس 2: المجلدات والمسارات</a>
+        <a href="#l3">الدرس 3: الملفات</a>
+        <a href="#l4">الدرس 4: الصلاحيات والمستخدمين</a>
+        <div class="level-title">📝 المستوى الثاني</div>
+        <a href="#l5">الدرس 5: القنوات وإعادة التوجيه</a>
+        <a href="#l6">الدرس 6: awk و sed</a>
+        <div class="level-title">💻 المستوى الثالث</div>
+        <a href="#l7">الدرس 7: المتغيرات والمصفوفات</a>
+        <a href="#l8">الدرس 8: الشروط والحلقات</a>
+        <a href="#l9">الدرس 9: الدوال</a>
+        <div class="level-title">⚙️ المستوى الرابع</div>
+        <a href="#l10">الدرس 10: إدارة العمليات</a>
+        <a href="#l11">الدرس 11: المهام المجدولة Cron</a>
+        <a href="#l12">الدرس 12: إدارة الحزم</a>
+        <div class="level-title">🌐 المستوى الخامس</div>
+        <a href="#l13">الدرس 13: الشبكات الأساسية</a>
+        <a href="#l14">الدرس 14: SSH والعمل عن بعد</a>
+        <div class="level-title">🛠️ المستوى السادس</div>
+        <a href="#l15">الدرس 15: Git</a>
+        <a href="#l16">الدرس 16: GCC و Make</a>
+        <a href="#l17">الدرس 17: GDB والتنقيح</a>
+        <div class="level-title">📊 المستوى السابع</div>
+        <a href="#l18">الدرس 18: CSV و csvkit</a>
+        <a href="#l19">الدرس 19: JSON و jq</a>
+        <a href="#l20">الدرس 20: SQLite</a>
+        <div class="level-title">🐳 المستوى الثامن</div>
+        <a href="#l21">الدرس 21: venv</a>
+        <a href="#l22">الدرس 22: Conda</a>
+        <a href="#l23">الدرس 23: Docker</a>
+        <div class="level-title">🚀 المستوى التاسع</div>
+        <a href="#l24">الدرس 24: tmux</a>
+        <a href="#l25">الدرس 25: Vim</a>
+        <a href="#l26">الدرس 26: التخصيص</a>
+        <div class="level-title">🤖 المستوى العاشر</div>
+        <a href="#l27">الدرس 27: GPU والتدريب</a>
+        <a href="#l28">الدرس 28: البيانات الضخمة CLI</a>
+        <a href="#l29">الدرس 29: أتمتة سير العمل</a>
+        <a href="#l30">الدرس 30: إدارة الأسرار</a>
+        <a href="#l31">الدرس 31: الضغط والأرشفة</a>
+        <a href="#l32">الدرس 32: Hexdump</a>
+        <a href="#l33">الدرس 33: find و locate</a>
+        <a href="#l34">الدرس 34: مراقبة الأداء</a>
+        <a href="#l35">الدرس 35: Docker Compose</a>
+        <a href="#l36">الدرس 36: سكريبتات متقدمة</a>
+        <a href="#l37">الدرس 37: GNU parallel</a>
+        <a href="#l38">الدرس 38: awk متقدم</a>
+        <a href="#l39">الدرس 39: بيئة تطوير طرفية</a>
+        <a href="#l40">الدرس 40: مشاريع نهائية</a>
+        <a href="#conclusion">خاتمة</a>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <h1>🐧 المقرر الشامل لسطر أوامر لينكس</h1>
+        <p class="subtitle">من الصفر إلى الاحتراف لمهندسي البرمجيات والذكاء الاصطناعي</p>
+
+        <!-- TABLE OF CONTENTS (mobile) -->
+        <details class="toc-mini">
+            <summary>📋 فهرس سريع للمقرر</summary>
+            <ul>
+                <li><a href="#preface">قبل أن تبدأ</a></li>
+                <li><a href="#l1">1: الشيل والطرفية</a></li>
+                <li><a href="#l2">2: المجلدات والمسارات</a></li>
+                <li><a href="#l3">3: الملفات</a></li>
+                <li><a href="#l4">4: الصلاحيات والمستخدمين</a></li>
+                <li><a href="#l5">5: القنوات وإعادة التوجيه</a></li>
+                <li><a href="#l6">6: awk و sed</a></li>
+                <li><a href="#l7">7: المتغيرات والمصفوفات</a></li>
+                <li><a href="#l8">8: الشروط والحلقات</a></li>
+                <li><a href="#l9">9: الدوال</a></li>
+                <li><a href="#l10">10: إدارة العمليات</a></li>
+                <li><a href="#l11">11: المهام المجدولة</a></li>
+                <li><a href="#l12">12: إدارة الحزم</a></li>
+                <li><a href="#l13">13: الشبكات الأساسية</a></li>
+                <li><a href="#l14">14: SSH والعمل عن بعد</a></li>
+                <li><a href="#l15">15: Git</a></li>
+                <li><a href="#l16">16: GCC و Make</a></li>
+                <li><a href="#l17">17: GDB والتنقيح</a></li>
+                <li><a href="#l18">18: CSV و csvkit</a></li>
+                <li><a href="#l19">19: JSON و jq</a></li>
+                <li><a href="#l20">20: SQLite</a></li>
+                <li><a href="#l21">21: venv</a></li>
+                <li><a href="#l22">22: Conda</a></li>
+                <li><a href="#l23">23: Docker</a></li>
+                <li><a href="#l24">24: tmux</a></li>
+                <li><a href="#l25">25: Vim</a></li>
+                <li><a href="#l26">26: التخصيص</a></li>
+                <li><a href="#l27">27: GPU والتدريب</a></li>
+                <li><a href="#l28">28: البيانات الضخمة CLI</a></li>
+                <li><a href="#l29">29: أتمتة سير العمل</a></li>
+                <li><a href="#l30">30: إدارة الأسرار</a></li>
+                <li><a href="#l31">31: الضغط والأرشفة</a></li>
+                <li><a href="#l32">32: Hexdump</a></li>
+                <li><a href="#l33">33: find و locate</a></li>
+                <li><a href="#l34">34: مراقبة الأداء</a></li>
+                <li><a href="#l35">35: Docker Compose</a></li>
+                <li><a href="#l36">36: سكريبتات متقدمة</a></li>
+                <li><a href="#l37">37: GNU parallel</a></li>
+                <li><a href="#l38">38: awk متقدم</a></li>
+                <li><a href="#l39">39: بيئة تطوير طرفية</a></li>
+                <li><a href="#l40">40: مشاريع نهائية</a></li>
+                <li><a href="#conclusion">خاتمة</a></li>
+            </ul>
+        </details>
+
+        <!-- ==================== PREFACE ==================== -->
+        <section id="preface">
+            <h2>📌 قبل أن تبدأ</h2>
+            <ul>
+                <li>جهّز بيئة لينكس: إما جهاز وهمي باستخدام <strong>VirtualBox</strong> مع Ubuntu، أو <strong>WSL2</strong> على ويندوز، أو <strong>Docker container</strong>، أو مباشرة على حاسوبك إن كنت تستخدم لينكس.</li>
+                <li>افتح الطرفية (<span class="path">Terminal</span>) وكن مستعداً لكتابة كل أمر بيدك. <strong>لا تنسخ وتلصق إلا بعد أن تفهم.</strong></li>
+                <li>كل أمر موجود هنا اقرأ شرحه ثم نفّذه، ثم غيّر فيه لتختبر فهمك.</li>
+            </ul>
+        </section>
+
+        <!-- ==================== LEVEL 1 ==================== -->
+        <section id="l1">
+            <h2>🔰 المستوى الأول: الأساسيات المطلقة (File System & Navigation)</h2>
+            <h3>الدرس 1: ما هي الشيل (Shell) وكيف تعمل الطرفية</h3>
+            <ul>
+                <li>عند فتح الطرفية، أنت تتحدث مع برنامج اسمه <strong>shell</strong> (غالباً bash أو zsh).</li>
+                <li>يقرأ هذا البرنامج أوامرك وينفذها، ويظهر لك النتائج.</li>
+                <li><strong>المحث (prompt)</strong> يخبرك باسم المستخدم واسم الجهاز والمسار الحالي وينتظر إدخالك:</li>
+            </ul>
+            <pre><code>username@hostname:~$</code></pre>
+            <p>علامة <code>~</code> ترمز إلى مجلد المنزل (<span class="path">Home</span>) الخاص بك.</p>
+            <h4>الأوامر الأولى</h4>
+            <pre><code>echo "Hello, Terminal"</code></pre>
+            <p><code>echo</code> يطبع ما تكتبه. جرب <code>echo $HOME</code> أو <code>echo $USER</code> لترى متغيرات البيئة.</p>
+            <pre><code>date</code></pre>
+            <p>يعرض التاريخ والوقت.</p>
+            <pre><code>whoami</code></pre>
+            <p>يعرض اسم المستخدم الحالي.</p>
+            <pre><code>clear</code></pre>
+            <p>يمسح الشاشة (أو استخدم <kbd>Ctrl+L</kbd>).</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>افتح الطرفية واطبع جملة ترحيبية.</li>
+                    <li>اعرض التاريخ، ثم امسح الشاشة.</li>
+                    <li>اطبع اسم المستخدم ومجلد المنزل باستخدام المتغيرات.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l2">
+            <h3>الدرس 2: التعامل مع المجلدات والمسارات</h3>
+            <p>نظام الملفات في لينكس هو شجرة تبدأ من الجذر <code>/</code>.</p>
+            <p><strong>pwd</strong> (print working directory): يطبع المسار الحالي.</p>
+            <pre><code>pwd</code></pre>
+            <p>الناتج غالباً <span class="path">/home/username</span>.</p>
+            <h4>التنقل بين المجلدات</h4>
+            <ul>
+                <li><strong>ls</strong>: عرض محتويات المجلد الحالي.</li>
+            </ul>
+            <pre><code>ls
+                ls -l   # عرض تفصيلي (صلاحيات، حجم، تاريخ)
+                ls -a   # عرض الملفات المخفية (التي تبدأ بنقطة)
+                ls -lh  # حجم مقروء للإنسان (مثل 1K, 234M)
+            ls -la  # دمج الخيارين</code></pre>
+            <ul>
+                <li><strong>cd</strong>: تغيير المجلد (change directory).</li>
+            </ul>
+            <pre><code>cd /            # انتقل إلى الجذر
+                cd ~            # انتقل إلى المنزل
+                cd ..           # انتقل للمجلد الأب
+                cd ../..        # مستويين للأعلى
+                cd -            # العودة للمجلد السابق
+            cd              # بدون وسيط يعيدك للمنزل</code></pre>
+            <ul>
+                <li><strong>المسارات النسبية والمطلقة:</strong></li>
+                <ul>
+                    <li>مطلق: يبدأ من الجذر <span class="path">/home/user/Documents</span></li>
+                    <li>نسبي: بالنسبة للمجلد الحالي <span class="path">Documents/Projects</span></li>
+                </ul>
+            </ul>
+            <h4>إنشاء وحذف المجلدات</h4>
+            <pre><code>mkdir new_folder        # إنشاء مجلد
+                mkdir -p a/b/c          # إنشاء سلسلة مجلدات دفعة واحدة (أيضاً ينشئ الآباء إن لم توجد)
+                rmdir empty_folder      # حذف مجلد فارغ
+                rm -r folder            # حذف مجلد بمحتوياته (انتبه، لا سلة مهملات!)
+            rm -ri folder           # حذف مع طلب تأكيد لكل ملف</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>انتقل إلى المجلد الجذر، شاهد محتوياته، ثم عد إلى المنزل.</li>
+                    <li>أنشئ مجلد باسم <span class="path">test</span> داخل المنزل، وبداخله مجلدين <span class="path">src</span> و <span class="path">bin</span> باستخدام أمر واحد.</li>
+                    <li>احذف المجلد <span class="path">test</span> مع تأكيد الحذف لكل عنصر.</li>
+                    <li>استخدم <code>ls -la</code> في المنزل وحدد الملفات المخفية.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l3">
+            <h3>الدرس 3: الملفات – الإنشاء والعرض والنسخ والنقل</h3>
+            <p>في لينكس <strong>"كل شيء ملف"</strong> حتى الأجهزة.</p>
+            <h4>إنشاء ملفات فارغة أو بمحتوى</h4>
+            <pre><code>touch file.txt                # إنشاء ملف فارغ أو تحديث وقت التعديل إن كان موجوداً
+                echo "Hello" > greeting.txt   # إعادة توجيه مخرجات echo إلى ملف (ينشئه أو يمسح محتواه القديم)
+            echo "Second line" >> greeting.txt  # إلحاق بالنهاية (append)</code></pre>
+            <h4>عرض محتوى الملفات</h4>
+            <pre><code>cat greeting.txt     # طباعة المحتوى كاملاً
+                less greeting.txt    # عرض تفاعلي (استخدم المسافة للصفحة التالية، q للخروج)
+                head -n 5 file.txt   # أول 5 أسطر
+                tail -n 5 file.txt   # آخر 5 أسطر
+            tail -f log.txt      # متابعة الملف في الزمن الحقيقي (مهم لمراقبة السجلات)</code></pre>
+            <h4>نسخ ونقل وإعادة تسمية</h4>
+            <pre><code>cp source.txt dest.txt       # نسخ
+                cp -r folder1 folder2        # نسخ مجلد بمحتوياته
+                mv oldname.txt newname.txt   # إعادة تسمية أو نقل
+            mv file.txt /path/to/dest/   # نقل الملف</code></pre>
+            <h4>حذف الملفات</h4>
+            <pre><code>rm file.txt          # حذف ملف
+            rm -i file.txt       # تأكيد قبل الحذف</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ ملفاً باسم <span class="path">notes.txt</span> واكتب فيه 10 أسطر بأي نص (باستخدام <code>echo</code> والإلحاق عدة مرات).</li>
+                    <li>اعرض أول 3 أسطر وآخر 3 أسطر.</li>
+                    <li>انسخ الملف إلى <span class="path">notes_backup.txt</span>، ثم احذف الملف الأصلي.</li>
+                    <li>افتح الملف المنسوخ بـ <code>less</code> وتجول داخله.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l4">
+            <h3>الدرس 4: الصلاحيات والمستخدمين</h3>
+            <p>كل ملف له <strong>مالك</strong> و<strong>مجموعة</strong> وثلاث مجموعات صلاحيات: للمالك (user)، للمجموعة (group)، للآخرين (others).</p>
+            <p>الصلاحيات: قراءة (<code>r=4</code>)، كتابة (<code>w=2</code>)، تنفيذ (<code>x=1</code>).</p>
+            <pre><code>ls -l
+            # -rw-r--r-- 1 user group 1234 Jan 1 12:34 file.txt</code></pre>
+            <ul>
+                <li>أول حرف <code>-</code> لملف عادي، <code>d</code> لمجلد، <code>l</code> لرابط رمزي.</li>
+                <li>الرموز التالية: <code>rw-</code> للمالك، <code>r--</code> للمجموعة، <code>r--</code> للآخرين.</li>
+            </ul>
+            <h4>تغيير الصلاحيات</h4>
+            <pre><code>chmod 755 script.sh     # rwxr-xr-x
+                chmod +x script.sh      # إضافة صلاحية التنفيذ للجميع
+                chmod u+x script.sh     # إضافة تنفيذ للمالك فقط
+            chmod go-w file.txt     # إزالة الكتابة للمجموعة والآخرين</code></pre>
+            <h4>تغيير المالك والمجموعة</h4>
+            <pre><code>chown user:group file.txt
+            chown -R user:group folder/   # تغيير تكراري</code></pre>
+            <p>عادة تحتاج <code>sudo</code> لتغيير المالك.</p>
+            <h4>sudo وتنفيذ الأوامر كمدير النظام</h4>
+            <p><code>sudo command</code> ينفذ الأمر بصلاحيات الجذر (root). يستخدم بحذر. تعديل ملفات النظام يحتاج <code>sudo</code>.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ سكريبت بسيط <span class="path">hello.sh</span> يحتوي على <code>#!/bin/bash</code> وسطر <code>echo "Hello"</code>.</li>
+                    <li>شاهد صلاحياته، ثم اجعله قابلاً للتنفيذ ونفّذه (<code>./hello.sh</code>).</li>
+                    <li>جرب تغيير صلاحياته لتكون للقراءة فقط ثم حاول تعديله بـ <code>echo "new line" &gt;&gt; hello.sh</code> (سيُرفض).</li>
+                    <li>أنشئ مجلداً، غيّر صلاحياته بحيث لا يمكن دخوله (مثلاً <code>chmod 000 folder</code>)، ثم حاول <code>cd</code> إليه لترى الخطأ.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 2 ==================== -->
+        <section id="l5">
+            <h2>📝 المستوى الثاني: معالجة النصوص وإعادة التوجيه (Text Processing & Redirection)</h2>
+            <h3>الدرس 5: القنوات (Pipes) وإعادة التوجيه</h3>
+            <p>كل أمر له مدخل قياسي (<strong>stdin</strong>)، مخرج قياسي (<strong>stdout</strong>)، ومخرج أخطاء (<strong>stderr</strong>). يمكن توجيهها:</p>
+            <pre><code>command > file      # stdout إلى ملف (مسح المحتوى)
+                command >> file     # stdout إلى ملف (إلحاق)
+                command 2> file     # stderr إلى ملف
+                command &> file     # كلاهما إلى ملف
+            command < file      # stdin من ملف</code></pre>
+            <p><strong>الأنابيب (pipe)</strong> <code>|</code> تأخذ مخرج أمر وتجعله مدخلاً لأمر آخر:</p>
+            <pre><code>ls -l | grep "txt"        # إظهار الملفات التي تحتوي txt
+            cat /var/log/syslog | less</code></pre>
+            <h4>أوامر التصفية الأساسية</h4>
+            <pre><code>grep "pattern" file        # البحث عن نمط في ملف
+                grep -i "pattern" file     # تجاهل حالة الأحرف
+                grep -r "TODO" ./src       # بحث تكراري في مجلد
+                grep -v "pattern" file     # عكس البحث (الأسطر التي لا تحتوي النمط)
+                grep -c "error" log.txt    # عد الأسطر المتطابقة
+                sort file.txt              # ترتيب أبجدي
+                sort -n numbers.txt        # ترتيب رقمي
+                sort -r                    # عكسي
+            sort -u                    # إزالة التكرار</code></pre>
+            <pre><code>wc file.txt        # عدد الأسطر والكلمات والحروف
+            wc -l file.txt     # عدد الأسطر فقط</code></pre>
+            <pre><code>uniq file.txt           # إزالة الأسطر المكررة المتجاورة (غالباً بعد sort)
+            uniq -c                 # عد تكرار كل سطر</code></pre>
+            <pre><code>cut -d':' -f1 /etc/passwd   # استخراج الحقل الأول باستخدام ':' كفاصل
+            cut -c1-5 file.txt          # استخراج الأحرف من 1 إلى 5</code></pre>
+            <pre><code>tr 'a-z' 'A-Z' < file.txt   # تحويل لحروف كبيرة
+            tr -d '\r' < winfile.txt    # حذف رمز العودة (\r) لتحويل ملفات ويندوز</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ ملف <span class="path">names.txt</span> يحتوي 20 اسماً مكرراً وغير مرتب. ثم نفذ:
+                        <ul>
+                            <li><code>sort names.txt | uniq</code> لاستخراج قائمة فريدة.</li>
+                            <li><code>sort names.txt | uniq -c | sort -nr</code> لترتيب الأسماء حسب التكرار.</li>
+                            <li><code>grep -c "^A" names.txt</code> لعد الأسماء التي تبدأ بحرف A.</li>
+                        </ul>
+                    </li>
+                    <li>خذ مخرجات <code>ls -la</code> ومررها لـ <code>grep</code> لإظهار الملفات التي امتدادها <span class="path">.txt</span> فقط.</li>
+                    <li>استخدم <code>cut</code> مع <span class="path">/etc/passwd</span> لعرض أسماء المستخدمين وقذائفهم.</li>
+                    <li>وجّه <strong>stderr</strong> لأمر غير موجود إلى ملف <span class="path">error.log</span>.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l6">
+            <h3>الدرس 6: أدوات النص المتقدمة – awk و sed (لمحة أولى)</h3>
+            <p>سنتعمق لاحقاً، لكن الأساسيات الآن.</p>
+            <h4>sed (محرر التيار)</h4>
+            <pre><code>sed 's/old/new/' file.txt          # استبدال أول ظهور في كل سطر
+                sed 's/old/new/g' file.txt         # استبدال كل الظهورات
+                sed '/pattern/d' file.txt          # حذف الأسطر التي تحوي النمط
+            sed -i 's/foo/bar/g' file.txt      # تعديل الملف في مكانه (احذر)</code></pre>
+            <h4>awk (لغة معالجة نصوص عمودية)</h4>
+            <pre><code>awk '{print $1}' file.txt            # طباعة العمود الأول (افتراضي الفاصل مسافة)
+                awk -F':' '{print $1, $3}' /etc/passwd  # فاصل مخصص، ثم عمودين
+            awk '$3 > 1000 {print $1}' /etc/passwd  # شرط: المستخدمين ذوي UID > 1000</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ ملف CSV بسيط (استخدم فاصلة كفاصل): <code>name,age,grade</code> واملأه ببعض البيانات.</li>
+                    <li>استخدم <code>awk -F',' '{print $1, $3}' file.csv</code> لاستخراج الاسم والدرجة.</li>
+                    <li>استخدم <code>sed</code> لتغيير كل فاصلة إلى فاصلة منقوطة.</li>
+                    <li>استخدم <code>awk</code> لحساب مجموع عمود الأعمار.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 3 ==================== -->
+        <section id="l7">
+            <h2>💻 المستوى الثالث: أساسيات كتابة سكريبتات Bash</h2>
+            <h3>الدرس 7: المتغيرات والمصفوفات</h3>
+            <pre><code>#!/bin/bash
+                name="Ahmed"
+                age=25
+            echo "Name: $name, Age: $age"</code></pre>
+            <ul>
+                <li>لا توجد مسافات حول <code>=</code> في تعريف المتغير.</li>
+                <li>لاستخدام المتغير: <code>$var</code> أو <code>${var}</code> (لحماية من الالتباس).</li>
+                <li>متغيرات خاصة: <code>$0</code> اسم السكريبت، <code>$1, $2, ...</code> وسائط السكريبت، <code>$#</code> عدد الوسائط، <code>$@</code> كل الوسائط كقائمة، <code>$?</code> قيمة الخروج للأمر الأخير (0 يعني نجاح).</li>
+            </ul>
+            <pre><code>array=(one two three)
+                echo ${array[1]}   # ثاني عنصر
+            echo ${array[@]}   # كل العناصر</code></pre>
+            <h4>الأمر read</h4>
+            <pre><code>echo "Enter your name:"
+                read username
+            echo "Hello, $username"</code></pre>
+            <h4>العمليات الحسابية</h4>
+            <pre><code>result=$((5 + 3))
+            echo $result</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>اكتب سكريبت <span class="path">greet.sh</span> يأخذ اسم المستخدم كوسيط أول ويطبع <code>"Hello, [name]"</code>. إن لم يعطَ وسيطاً، يطلب إدخاله بـ <code>read</code>.</li>
+                    <li>أنشئ مصفوفة بخمس كلمات واطبعها واحدة واحدة باستخدام حلقة <code>for</code>.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l8">
+            <h3>الدرس 8: العبارات الشرطية والحلقات</h3>
+            <h4>if</h4>
+            <pre><code>if [ $age -ge 18 ]; then
+                    echo "Adult"
+                elif [ $age -ge 13 ]; then
+                    echo "Teen"
+                else
+                    echo "Child"
+            fi</code></pre>
+            <ul>
+                <li>المقارنات العددية: <code>-eq, -ne, -lt, -le, -gt, -ge</code>.</li>
+                <li>مقارنات النصوص: <code>=, !=, -z</code> (سلسلة فارغة)، <code>-n</code> (غير فارغة).</li>
+                <li>اختبار الملفات: <code>-f file</code> (موجود وملف عادي)، <code>-d dir</code> (موجود ومجلد)، <code>-x file</code> (قابل للتنفيذ)، إلخ.</li>
+                <li><code>[[ ]]</code> أفضل من <code>[ ]</code> لأنها تدعم أنماط وتعابير نمطية.</li>
+            </ul>
+            <h4>case</h4>
+            <pre><code>case $var in
+                    start)
+                        echo "Starting...";;
+                    stop)
+                        echo "Stopping...";;
+                    *)
+                        echo "Unknown";;
+            esac</code></pre>
+            <h4>الحلقات</h4>
+            <pre><code>for i in 1 2 3; do
+                    echo $i
+                done
+                for file in *.txt; do
+                    echo "Processing $file"
+                done
+                while [ $count -le 5 ]; do
+                    echo $count
+                    ((count++))
+            done</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>اكتب سكريبت يختبر ما إذا كان الملف المعطى كوسيط موجوداً، ويطبع "موجود" أم لا.</li>
+                    <li>اكتب سكريبت يأخذ امتداد ملفات كوسيط (مثلاً <code>txt</code>) ويطبع أسماء كل الملفات بهذا الامتداد في المجلد الحالي، ثم يعدها.</li>
+                    <li>استخدم <code>while</code> لقراءة ملف سطراً سطراً (استخدم <code>while read line</code>).</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l9">
+            <h3>الدرس 9: الدوال ونطاق المتغيرات</h3>
+            <pre><code>function greet {
+                    local name=$1   # local يجعل المتغير محلياً داخل الدالة
+                    echo "Hello, $name"
+                }
+            greet "Ali"</code></pre>
+            <p>الخروج من دالة بقيمة: <code>return 0</code> (تصل عبر <code>$?</code>). لكن لاسترجاع نصوص، استخدم <code>echo</code> مع capture: <code>result=$(my_func)</code>.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>اكتب سكريبتاً به دالة تحسب مضروب عدد (factorial) باستخدام التكرار أو recursion، ثم استدعها.</li>
+                    <li>أنشئ دالة <code>log</code> تطبع رسالة مع طابع زمني.</li>
+                    <li>استخدم <code>source</code> لتضمين دوال من ملف آخر (مثل <span class="path">utils.sh</span>).</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 4 ==================== -->
+        <section id="l10">
+            <h2>⚙️ المستوى الرابع: إدارة النظام والعمليات (System & Process Management)</h2>
+            <h3>الدرس 10: إدارة العمليات</h3>
+            <pre><code>ps aux                 # عرض كل العمليات
+                top                    # مراقبة مباشرة (اضغط q للخروج)
+            htop                   # بديل محسن إن كان مثبتاً</code></pre>
+            <p>تشغيل أمر في الخلفية:</p>
+            <pre><code>command &</code></pre>
+            <ul>
+                <li><code>jobs</code> يعرض المهام الخلفية.</li>
+                <li><code>fg %1</code> لإرجاع المهمة رقم 1 للأمام.</li>
+                <li><code>bg %1</code> لإكمال مهمة موقوفة في الخلفية.</li>
+                <li><code>kill PID</code> لإيقاف عملية (PID من <code>ps</code>). <code>kill -9 PID</code> للقتل الإجباري.</li>
+                <li><code>killall process_name</code> لقتل كل العمليات بهذا الاسم.</li>
+                <li><code>nohup command &</code> لتشغيل أمر يستمر حتى بعد إغلاق الطرفية.</li>
+                <li><code>disown</code> لفصل عملية من الجلسة.</li>
+            </ul>
+            <h4>مراقبة الموارد</h4>
+            <pre><code>free -h        # الذاكرة
+                df -h          # مساحة الأقراص
+            du -sh folder  # حجم مجلد</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>افتح محرر <code>gedit</code> (أو أي برنامج) من الطرفية ثم أوقفه بـ <kbd>Ctrl+Z</kbd>، اكتب <code>jobs</code> ثم <code>fg</code>.</li>
+                    <li>شغّل أمر <code>sleep 100 &</code>، ثم اقتله باستخدام PID.</li>
+                    <li>اكتب أمراً يراقب ملف log ويتابع إضافاته: <code>tail -f /var/log/syslog</code> ثم قاطعه بـ <kbd>Ctrl+C</kbd>.</li>
+                    <li>استخدم <code>du -sh * | sort -h</code> في مجلد المنزل لترتيب المجلدات حسب الحجم.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l11">
+            <h3>الدرس 11: المهام المجدولة (Cron)</h3>
+            <pre><code>crontab -e    # تعديل جدول المهام للمستخدم
+            crontab -l    # عرض الجدول</code></pre>
+            <p>الصيغة: <code>دقيقة ساعة يوم_الشهر شهر يوم_الأسبوع الأمر</code></p>
+            <p>مثال: كل يوم عند 2:30 صباحاً: <code>30 2 * * * /home/user/backup.sh</code></p>
+            <p>تدوينات خاصة: <code>@reboot, @daily, @hourly</code>.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ سكريبت يكتب <code>"Hello from cron"</code> مع التاريخ إلى ملف في <span class="path">/tmp/cron_test.log</span>.</li>
+                    <li>أضف مهمة crontab لتشغيله كل دقيقة، راقب الملف لتتأكد، ثم احذف المهمة.</li>
+                    <li>أنشئ مهمة تمسح الملفات المؤقتة أسبوعياً.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l12">
+            <h3>الدرس 12: إدارة الحزم (Package Management) – مهم جداً</h3>
+            <p>نظام APT (ديبيان/أوبونتو):</p>
+            <pre><code>sudo apt update                # تحديث قائمة الحزم
+                sudo apt upgrade               # ترقية الحزم المثبتة
+                sudo apt install package_name  # تثبيت
+                sudo apt remove package_name   # إزالة (يحتفظ بالإعدادات)
+                sudo apt purge package_name    # إزالة كاملة
+                apt search keyword             # بحث
+            apt show package_name          # تفاصيل</code></pre>
+            <p>إضافة مستودعات PPA، تثبيت حزم <span class="path">.deb</span>. أدوات أخرى: snap, flatpak, pip, conda – سنأتي إليها.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>حدث النظام وثبت <code>htop, tree, neofetch</code>.</li>
+                    <li>استخدم <code>apt search</code> للبحث عن مترجم Python 3.10.</li>
+                    <li>استخدم <code>dpkg -l | grep python</code> لعرض كل حزم python المثبتة.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 5 ==================== -->
+        <section id="l13">
+            <h2>🌐 المستوى الخامس: الشبكات والعمل عن بُعد (Networking & Remote Work)</h2>
+            <h3>الدرس 13: أوامر الشبكات الأساسية</h3>
+            <pre><code>ping google.com              # اختبار الاتصال (أوقفه بـ Ctrl+C)
+            ping -c 4 google.com         # 4 رزم</code></pre>
+            <pre><code>curl https://api.example.com # جلب محتوى URL
+                curl -O http://example.com/file.txt  # تنزيل ملف
+            wget http://example.com/file.txt     # تنزيل ملفات (أقوى)</code></pre>
+            <pre><code>ip addr show            # عرض عناوين IP (أو ifconfig -a)
+                ip route                # جدول التوجيه
+                ss -tulpn               # المنافذ المفتوحة والبرامج المستخدمة
+            netstat -tulpn          # قد يحتاج net-tools</code></pre>
+            <pre><code>nslookup google.com     # استعلام DNS
+            dig google.com          # أكثر تفصيلاً</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>استخدم <code>curl</code> لجلب محتوى صفحة ويب وحفظه في ملف.</li>
+                    <li>استخدم <code>curl</code> لإرسال طلب POST مع بيانات JSON إلى خدمة اختبار مثل jsonplaceholder.</li>
+                    <li>افحص المنافذ المستخدمة حالياً وحدد البرنامج الذي يستمع على المنفذ 22 (SSH).</li>
+                    <li>استخدم <code>ping</code> لقياس التأخير.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l14">
+            <h3>الدرس 14: SSH والعمل عن بعد</h3>
+            <pre><code>ssh user@remote_host          # الاتصال
+                ssh -p 2222 user@host         # منفذ مختلف
+            ssh -i ~/.ssh/key user@host   # باستخدام مفتاح خاص</code></pre>
+            <h4>توليد مفاتيح SSH</h4>
+            <pre><code>ssh-keygen -t ed25519 -C "your_email@example.com"</code></pre>
+            <p>يضع المفتاح العام في <span class="path">~/.ssh/id_ed25519.pub</span>، انسخه للخادم البعيد <span class="path">~/.ssh/authorized_keys</span>.</p>
+            <h4>نقل الملفات</h4>
+            <pre><code>scp file.txt user@host:/path/          # نسخ إلى الخادم
+                scp user@host:/path/file.txt .         # نسخ من الخادم
+            rsync -avz folder/ user@host:/path/    # مزامنة متقدمة (أسرع للكميات الكبيرة)</code></pre>
+            <h4>تشغيل أوامر عن بعد</h4>
+            <pre><code>ssh user@host 'ls -la /var/www'</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>إذا كان لديك خادم (أو يمكنك تثبيت openssh-server محلياً والاتصال بـ localhost)، أنشئ مفتاح SSH وانسخه لتسجيل الدخول بدون كلمة مرور.</li>
+                    <li>استخدم <code>scp</code> لنقل مجلد كامل.</li>
+                    <li>استخدم <code>rsync -n</code> (dry-run) لرؤية ما سيتم نسخه.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 6 ==================== -->
+        <section id="l15">
+            <h2>🛠️ المستوى السادس: أدوات التطوير (Git, Make, GCC, Debugging)</h2>
+            <h3>الدرس 15: نظام التحكم بالإصدارات Git عبر الطرفية</h3>
+            <pre><code>git init                  # إنشاء مستودع
+                git clone &lt;url&gt;           # استنساخ
+                git status                # الحالة
+                git add file.txt          # إضافة للتتبع
+                git add -p                # إضافة تفاعلية (chunks)
+                git commit -m "message"
+                git commit --amend        # تعديل آخر commit
+                git log --oneline --graph # سجل
+                git diff                  # الفروقات
+            git diff --staged         # الفروقات في منطقة التجهيز</code></pre>
+            <h4>الفروع والدمج</h4>
+            <pre><code>git branch feature        # إنشاء فرع
+                git checkout feature      # التبديل لفرع (أو git switch feature)
+                git checkout -b newbranch # إنشاء وتبديل
+                git merge feature         # دمج الفرع الحالي مع feature
+            git rebase main           # إعادة تطبيق التغييرات فوق main</code></pre>
+            <h4>التعامل مع الخوادم البعيدة</h4>
+            <pre><code>git remote add origin &lt;url&gt;
+                git push -u origin main
+                git pull
+            git fetch</code></pre>
+            <h4>حل التعارضات</h4>
+            <p>استخدم <code>git mergetool</code> أو حرر الملفات يدوياً.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ مستودعاً جديداً، وأضف ملف <span class="path">README.md</span>، و commit.</li>
+                    <li>أنشئ فرع <code>dev</code>، عدّل ملفاً، ادمج مع <code>main</code>.</li>
+                    <li>استخدم <code>git stash</code> لتخزين تعديلات مؤقتاً ثم استرجعها.</li>
+                    <li>أنشئ مستودعاً على GitHub وادفع مشروعك.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l16">
+            <h3>الدرس 16: الترجمة والبناء (GCC, Make)</h3>
+            <h4>GCC لـ C/C++</h4>
+            <pre><code>gcc -o program source.c      # ترجمة بسيطة
+                gcc -Wall -g source.c -o program  # مع تحذيرات ومعلومات التصحيح
+            ./program</code></pre>
+            <p>مكتبات: <code>-lm</code> للرياضيات، <code>-lcurl</code> لمكتبة curl، إلخ.</p>
+            <h4>Make</h4>
+            <p>ملف <span class="path">Makefile</span> يصف كيفية بناء المشروع.</p>
+            <pre><code>all: program
+                program: main.o utils.o
+                    gcc -o program main.o utils.o
+                main.o: main.c
+                    gcc -c main.c
+                utils.o: utils.c
+                    gcc -c utils.c
+                clean:
+                rm -f *.o program</code></pre>
+            <p>تنفيذ <code>make</code> يبني البرنامج، <code>make clean</code> ينظف.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>اكتب برنامج C بسيط (Hello world) وترجمه.</li>
+                    <li>أنشئ مشروعاً متعدد الملفات، واكتب Makefile.</li>
+                    <li>استخدم <code>make -j4</code> للبناء المتوازي.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l17">
+            <h3>الدرس 17: تنقيح الأخطاء (Debugging) باستخدام GDB والأدوات</h3>
+            <pre><code>gdb ./program
+                (gdb) break main
+                (gdb) run
+                (gdb) next
+                (gdb) print variable
+                (gdb) continue
+            (gdb) quit</code></pre>
+            <ul>
+                <li><code>strace</code> لتتبع استدعاءات النظام.</li>
+                <li><code>ltrace</code> لتتبع مكتبات.</li>
+                <li><code>valgrind</code> لكشف تسرب الذاكرة.</li>
+            </ul>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>اكتب برنامجاً به خطأ تجزئة (segfault)، واستخدم <code>gdb</code> لتحديد مكانه.</li>
+                    <li>حلل برنامجاً بـ <code>valgrind --leak-check=full ./program</code>.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 7 ==================== -->
+        <section id="l18">
+            <h2>📊 المستوى السابع: التعامل مع البيانات (CSV, JSON, SQLite, أدوات CLI للبيانات)</h2>
+            <h3>الدرس 18: أدوات معالجة CSV/TSV</h3>
+            <p><strong>csvkit</strong> (تثبيت: <code>pip install csvkit</code> أو <code>sudo apt install csvkit</code>)</p>
+            <pre><code>csvcut -c name,age file.csv        # اختيار أعمدة
+                csvsort -c age file.csv            # ترتيب
+                csvgrep -c name -m "Ahmed" file.csv # بحث
+                csvstat file.csv                   # إحصائيات
+            csvlook file.csv                   # عرض جدولي جميل</code></pre>
+            <p>بدون أدوات خارجية: <code>awk</code> و <code>sort</code> و <code>grep</code> لكن csvkit أفضل.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>حمّل مجموعة بيانات CSV عامة (مثل iris)، استخدم <code>csvstat</code> لعرض إحصائيات.</li>
+                    <li>استخرج صفوفاً حيث قيمة العمود أكبر من عتبة.</li>
+                    <li>حوّل CSV إلى JSON باستخدام <code>csvjson</code>.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l19">
+            <h3>الدرس 19: معالجة JSON باستخدام jq</h3>
+            <p><strong>jq</strong> معالج JSON قوي جداً.</p>
+            <pre><code># تثبيت: sudo apt install jq
+                curl -s https://api.example.com/data | jq '.'
+                jq '.key' file.json                 # استخراج قيمة
+                jq '.[] | .name' file.json          # قائمة الأسماء من مصفوفة
+                jq '.[] | select(.age > 30)'        # تصفية
+            jq -s 'map(.price) | add'           # جمع أسعار</code></pre>
+            <p>يدعم تحويلات، صيغ متقدمة، إنشاء كائنات جديدة.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>استخدم <code>curl</code> على API عام يعيد JSON (مثل <code>https://api.github.com/users/username</code>) وطبق <code>jq</code> لاستخراج اسم المستخدم وعدد المستودعات العامة.</li>
+                    <li>أنشئ ملف JSON معقد، استخدم <code>jq</code> لتعديل قيمة وحفظها.</li>
+                    <li>استخدم <code>jq</code> لتحويل JSON إلى CSV.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l20">
+            <h3>الدرس 20: قواعد البيانات الخفيفة – SQLite في الطرفية</h3>
+            <pre><code>sqlite3 database.db
+                sqlite> .tables
+                sqlite> SELECT * FROM users;
+                sqlite> .mode csv
+                sqlite> .output out.csv
+                sqlite> SELECT * FROM users;
+            sqlite> .quit</code></pre>
+            <p>استيراد CSV: <code>.import file.csv table_name</code></p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ قاعدة بيانات، وجدولاً، وأدخل بيانات، ثم استفسر.</li>
+                    <li>صدّر نتائج الاستعلام إلى CSV و JSON (باستخدام <code>.mode json</code>).</li>
+                    <li>اكتب سكريبت bash يتصل بـ SQLite وينفذ استعلامات ويعالج النتائج.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 8 ==================== -->
+        <section id="l21">
+            <h2>🐳 المستوى الثامن: بيئات العمل الافتراضية والحاويات (venv, conda, Docker)</h2>
+            <h3>الدرس 21: البيئات الافتراضية في Python (venv/virtualenv)</h3>
+            <pre><code>python3 -m venv myenv          # إنشاء بيئة
+                source myenv/bin/activate      # تفعيل (Linux/Mac)
+            deactivate                     # إلغاء التفعيل</code></pre>
+            <ul>
+                <li>داخل البيئة: <code>pip install package</code> يثبت محلياً.</li>
+                <li><code>pip freeze &gt; requirements.txt</code> لتصدير التبعيات.</li>
+                <li><code>pip install -r requirements.txt</code> لاستيرادها.</li>
+            </ul>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ بيئتين افتراضيتين مختلفتين، ثبت في كل منهما إصداراً مختلفاً من مكتبة (مثل <code>numpy==1.21</code> و <code>1.23</code>).</li>
+                    <li>استخدم <span class="path">requirements.txt</span> لإعادة إنتاج بيئة.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l22">
+            <h3>الدرس 22: Conda (Miniconda/Anaconda) – أساسي لمهندسي الذكاء الاصطناعي</h3>
+            <pre><code>conda create -n myenv python=3.10   # إنشاء بيئة
+                conda activate myenv
+                conda install numpy pandas
+                conda list
+                conda deactivate
+                conda env export > environment.yml  # تصدير
+            conda env create -f environment.yml # استيراد</code></pre>
+            <p>قنوات (channels): <code>conda install -c conda-forge pytorch</code>.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ بيئة Conda، ثبت PyTorch (إصدار CPU للتبسيط)، وشغّل سكريبت Python صغير يتحقق من التثبيت.</li>
+                    <li>جرب إدارة بيئات متعددة وبدّل بينها.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l23">
+            <h3>الدرس 23: Docker – مهارة لا غنى عنها</h3>
+            <h4>المفاهيم الأساسية</h4>
+            <ul>
+                <li><strong>الصورة (Image)</strong> والحاوية <strong>(Container)</strong>.</li>
+                <li><strong>Dockerfile</strong> لبناء صورة.</li>
+            </ul>
+            <h4>الأوامر الأساسية</h4>
+            <pre><code>docker pull ubuntu:22.04
+                docker run -it ubuntu:22.04 bash       # تشغيل حاوية تفاعلية
+                docker run -d -p 8080:80 nginx         # حاوية خلفية مع ربط المنافذ
+                docker ps                              # الحاويات العاملة
+                docker ps -a                           # الكل
+                docker stop &lt;container_id&gt;
+                docker rm &lt;container_id&gt;
+                docker rmi &lt;image_id&gt;
+                docker build -t myapp:latest .         # بناء من Dockerfile في المسار الحالي
+                docker exec -it &lt;container&gt; bash       # فتح شيل داخل حاوية عاملة
+            docker logs &lt;container&gt;                # سجلات</code></pre>
+            <p><code>docker-compose</code> لتشغيل خدمات متعددة (YAML).</p>
+            <h4>Dockerfile مثال</h4>
+            <pre><code>FROM python:3.10-slim
+                WORKDIR /app
+                COPY requirements.txt .
+                RUN pip install -r requirements.txt
+                COPY . .
+            CMD ["python", "app.py"]</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>اكتب Dockerfile لتطبيق Python صغير يستخدم Flask، وابنه وشغّله.</li>
+                    <li>استخدم <code>docker-compose</code> لتشغيل تطبيق ويب مع قاعدة بيانات PostgreSQL.</li>
+                    <li>استخدم <code>docker exec</code> للدخول إلى حاوية تعمل وتصفح نظام ملفاتها.</li>
+                    <li>أنشئ حاوية GPU: <code>docker run --gpus all -it nvidia/cuda:11.8-base-ubuntu22.04 bash</code> (تحتاج nvidia-docker) لتجربة بيئة تعلم عميق.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 9 ==================== -->
+        <section id="l24">
+            <h2>🚀 المستوى التاسع: أدوات إنتاجية (tmux, vim, oh-my-zsh, اختصارات)</h2>
+            <h3>الدرس 24: tmux – مدير الجلسات الطرفية</h3>
+            <p>يسمح بتقسيم الشاشة، فصل وإعادة ربط الجلسات (مفيد عند SSH).</p>
+            <pre><code>tmux new -s session_name   # جلسة جديدة باسم
+                tmux attach -t session_name # إعادة ربط
+            tmux ls                    # قائمة الجلسات</code></pre>
+            <p>داخل tmux: <kbd>Ctrl+b</kbd> ثم مفتاح.</p>
+            <ul>
+                <li><kbd>%</kbd> تقسيم عمودي، <kbd>"</kbd> تقسيم أفقي.</li>
+                <li>التنقل: <kbd>Ctrl+b</kbd> ثم مفاتيح الأسهم.</li>
+                <li><kbd>d</kbd> لفصل (detach).</li>
+                <li><kbd>[</kbd> لدخول وضع التمرير (scroll) ويمكنك استخدام مفاتيح vim.</li>
+            </ul>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>ابدأ جلسة tmux، قسمها لأربع لوحات، شغّل أمراً مختلفاً في كل لوحة.</li>
+                    <li>افصل الجلسة، أعد الارتباط، ثم أغلق الجلسة.</li>
+                    <li>استخدم tmux للاتصال بخادم بعيد والتأكد من بقاء العمليات بعد فصل الشبكة.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l25">
+            <h3>الدرس 25: محرر Vim (أساسيات للمحترف)</h3>
+            <p>لأنك غالباً ستعدل ملفات على خوادم بعيدة، وأحياناً هو المحرر الوحيد.</p>
+            <h4>الأوضاع</h4>
+            <ul>
+                <li><strong>الوضع العادي (Normal):</strong> للتجول والأوامر.</li>
+                <li><strong>وضع الإدراج (Insert):</strong> للكتابة (اضغط <kbd>i</kbd>).</li>
+                <li><strong>وضع الأوامر (Command):</strong> <kbd>:</kbd> للتنفيذ.</li>
+            </ul>
+            <h4>أساسيات</h4>
+            <pre><code>i       -> إدراج قبل المؤشر
+                a       -> إدراج بعد المؤشر
+                Esc     -> العودة للوضع العادي
+                :w      -> حفظ
+                :q      -> خروج
+                :wq     -> حفظ وخروج
+                :q!     -> خروج بدون حفظ
+                dd      -> حذف سطر
+                yy      -> نسخ سطر
+                p       -> لصق
+                /pattern -> بحث (n التالي، N السابق)
+                u       -> تراجع
+            Ctrl+r  -> إعادة</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>افتح vim وأنشئ ملفاً جديداً، اكتب نصاً، احفظ واخرج.</li>
+                    <li>افتح ملفاً موجوداً، ابحث عن كلمة واستبدلها (<code>:%s/old/new/g</code>).</li>
+                    <li>قسم النافذة <code>:split</code> أو <code>:vsplit</code> وتنقل بينها.</li>
+                    <li>قم بتثبيت vim-plug وأضف بعض الإضافات (plugin) مثل NERDTree.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l26">
+            <h3>الدرس 26: تخصيص بيئتك: aliases, dotfiles, oh-my-zsh</h3>
+            <h4>الاسم المستعار (Alias)</h4>
+            <p>في <span class="path">~/.bashrc</span> أو <span class="path">~/.zshrc</span>:</p>
+            <pre><code>alias ll='ls -alF'
+                alias gs='git status'
+            alias ..='cd ..'</code></pre>
+            <h4>التوابع</h4>
+            <pre><code>mkcd() { mkdir -p "$1" && cd "$1"; }</code></pre>
+            <h4>Oh-My-Zsh (إن كنت تستخدم Zsh)</h4>
+            <p>تثبيت: <code>sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"</code></p>
+            <p>إضافات مفيدة: git, zsh-autosuggestions, zsh-syntax-highlighting.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ alias لأوامرك الأكثر استخداماً.</li>
+                    <li>عدّل محث (prompt) ليظهر اسم الفرع git.</li>
+                    <li>ثبت Oh-My-Zsh واستكشف الإضافات.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 10 ==================== -->
+        <section id="l27">
+            <h2>🤖 المستوى العاشر: تطبيقات متقدمة في البرمجيات والذكاء الاصطناعي</h2>
+            <h3>الدرس 27: مراقبة GPU وإدارة تجارب التعلم العميق</h3>
+            <p>بصفتك مهندس ذكاء اصطناعي، ستحتاج هذه الأدوات يومياً.</p>
+            <ul>
+                <li><strong>nvidia-smi:</strong> معلومات عن كروت الشاشة، الاستخدام، العمليات.</li>
+            </ul>
+            <pre><code>watch -n 1 nvidia-smi          # تحديث كل ثانية
+                nvidia-smi -l 1                # مراقبة مستمرة
+            gpustat -i 1                  # عرض أجمل (pip install gpustat)</code></pre>
+            <p>قتل عملية على GPU معينة: <code>kill -9 PID</code> من عمود PID في nvidia-smi.</p>
+            <h4>جدولة المهام وتجارب التشغيل</h4>
+            <p>استخدام <code>nohup</code> لتشغيل تدريب طويل:</p>
+            <pre><code>nohup python train.py > train.log 2>&1 &</code></pre>
+            <p>متابعة السجل: <code>tail -f train.log</code>.</p>
+            <p>إيقاف التدريب بأمان (إذا دعم برنامجك الإشارات): <code>kill -SIGINT PID</code>.</p>
+            <p>استخدام <code>screen</code> أو <code>tmux</code> لجلسات التدريب الطويلة.</p>
+            <pre><code>tmux new -s training
+                python train.py
+            # Ctrl+b d للفصل، يمكنك الخروج من SSH</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>نفذ برنامجاً يستخدم GPU (ولو بسيطاً مثل <code>python -c "import torch; torch.cuda.is_available()"</code>) وراقب استخدام الذاكرة عبر <code>nvidia-smi</code>.</li>
+                    <li>اكتب سكريبت Bash يبدأ عملية تدريب في الخلفية، يحفظ PID في ملف، ويتيح قتلها لاحقاً.</li>
+                    <li>استخدم <code>crontab</code> لتشغيل تدريب دوري.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l28">
+            <h3>الدرس 28: معالجة البيانات الضخمة باستخدام أدوات CLI</h3>
+            <p>في كثير من الأحيان، تحتاج لاستكشاف أو تنظيف ملفات بيانات ضخمة (عدة جيجابايت) قبل إدخالها في بايثون. الأوامر CLI أسرع بكثير.</p>
+            <ul>
+                <li>استخدام <code>head/tail</code> لمعاينة.</li>
+                <li><code>wc -l</code> لعد الأسطر.</li>
+                <li><code>split</code> لتقسيم ملفات ضخمة:</li>
+            </ul>
+            <pre><code>split -l 100000 huge.csv part_    # يقسم كل 100 ألف سطر</code></pre>
+            <ul>
+                <li><code>awk</code> لمعالجة سطرية: جمع، تصفية.</li>
+                <li><code>sort</code> مع خيار <code>-S</code> لتحديد حجم الذاكرة، و <code>-T</code> لمجلد مؤقت لملفات ضخمة.</li>
+                <li><code>grep -c</code> لعد الأنماط.</li>
+                <li>استخدام <code>pv</code> لمراقبة تقدم الأنابيب:</li>
+            </ul>
+            <pre><code>pv large_file.csv | gzip > large_file.csv.gz</code></pre>
+            <ul>
+                <li><code>jq</code> لمعالجة JSONL (سطر JSON في كل سطر).</li>
+            </ul>
+            <div class="exercise-box">
+                <h4>🏋️ تمرين عملي</h4>
+                <ol>
+                    <li>أنشئ ملف CSV كبير (بضعة ملايين سطور) باستخدام برنامج صغير أو <code>seq</code> مع <code>awk</code>. ثم استخدم <code>split</code> لتقسيمه، و <code>cat</code> لدمج الأجزاء.</li>
+                    <li>استخدم <code>awk</code> لحساب إحصاءات سريعة على عمود.</li>
+                    <li>استخدم <code>grep</code> مع <code>-c</code> لعد الأنماط ثم <code>sort -nr</code> لترتيب النتائج.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l29">
+            <h3>الدرس 29: أتمتة سير العمل (Workflow Automation) باستخدام Bash و Make</h3>
+            <p>بناء Makefile لمشاريع بايثون/تعلم آلة:</p>
+            <pre><code>data/raw.csv: src/download.py
+                    python src/download.py
+                data/processed.csv: data/raw.csv src/preprocess.py
+                    python src/preprocess.py
+                train: data/processed.csv src/train.py
+                    python src/train.py
+                clean:
+                rm -f data/*.csv models/*.pkl</code></pre>
+            <p>استخدام <code>make</code> يضمن إعادة تشغيل الخطوات عند تغير الاعتماديات.</p>
+            <p>كتابة سكريبتات Bash لتشغيل تجارب متعددة بمعاملات مختلفة:</p>
+            <pre><code>for lr in 0.001 0.01 0.1; do
+                    for bs in 32 64; do
+                        echo "Training with lr=$lr batch_size=$bs"
+                        python train.py --lr $lr --batch-size $bs
+                    done
+            done</code></pre>
+            <p>حفظ المخرجات لكل تجربة:</p>
+            <pre><code>python train.py --lr $lr > "logs/lr_${lr}_bs_${bs}.log" 2>&1</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>اكتب Makefile لمشروع تعلم آلة خيالي، وتعمد تغيير أحد الملفات لتشاهد كيف يعيد <code>make</code> بناء المعتمديات.</li>
+                    <li>اكتب سكريبت Bash يمر على قائمة ملفات إعدادات (<span class="path">config.yaml</span>) ويشغل تدريباً لكل منها، وينشئ تقريراً بالأداء باستخدام <code>grep</code> على ملفات السجلات.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l30">
+            <h3>الدرس 30: إدارة الأسرار والمتغيرات البيئية (Environment Variables & Secrets)</h3>
+            <p>تصدير متغيرات البيئة:</p>
+            <pre><code>export API_KEY="your_secret"
+            export DATABASE_URL="postgresql://..."</code></pre>
+            <ul>
+                <li>للاستخدام الدائم: أضفها إلى <span class="path">~/.bashrc</span> أو <span class="path">~/.profile</span>.</li>
+                <li>استخدام <span class="path">.env</span> مع أدوات مثل <code>python-dotenv</code>.</li>
+                <li>عدم إضافة الملفات الحساسة لـ Git (استخدم <span class="path">.gitignore</span>).</li>
+                <li>أمر <code>env</code> لعرض كل المتغيرات، و <code>printenv VAR</code>.</li>
+            </ul>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ متغير بيئة <code>MY_VAR</code> وجرب الوصول إليه من Bash ومن Python.</li>
+                    <li>اكتب سكريبت يستخدم متغير بيئة لكلمة مرور قاعدة البيانات ويخفيها عن <code>ps</code> (لا تظهر في <code>ps aux</code>).</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l31">
+            <h3>الدرس 31: ضغط وأرشفة الملفات</h3>
+            <pre><code>tar -czvf archive.tar.gz folder/   # إنشاء أرشيف مضغوط بـ gzip
+                tar -xzvf archive.tar.gz           # فك الضغط
+                tar -cjvf archive.tar.bz2 folder/  # bzip2 (ضغط أقوى)
+            tar -xJvf archive.tar.xz           # xz</code></pre>
+            <p>التعامل مع zip:</p>
+            <pre><code>zip -r archive.zip folder/
+            unzip archive.zip</code></pre>
+            <p>استخدام <code>gzip</code> و <code>gunzip</code> مباشرة على ملفات.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ أرشيفاً لمشروعك يحتوي على ملفات ومجلدات، ثم انقله لمسار آخر وفك ضغطه.</li>
+                    <li>قارن بين أحجام الأرشيفات باستخدام gzip, bzip2, xz.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l32">
+            <h3>الدرس 32: التعامل مع النصوص الثنائية والبيانات (Hexdump, xxd)</h3>
+            <pre><code>hexdump -C file.bin | head
+            xxd file.bin</code></pre>
+            <p>مفيد لفحص الملفات الثنائية، النماذج، أو تصحيح تنسيقات.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أنشئ ملفاً نصياً عادياً وملفاً ثنائياً بسيطاً، وقارن مخرجات <code>xxd</code>.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l33">
+            <h3>الدرس 33: البحث المتقدم عن الملفات (find, locate)</h3>
+            <pre><code>find /path -name "*.py"                # بالاسم
+                find /path -type f -mtime -7           # عدلت خلال 7 أيام
+                find /path -size +10M                  # أكبر من 10 ميجا
+            find . -name "*.log" -exec rm {} \;    # تنفيذ أمر على النتائج (احذر)</code></pre>
+            <p><code>locate filename</code> أسرع لكن يعتمد على قاعدة بيانات تحدث دورياً (<code>sudo updatedb</code>).</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>ابحث عن كل ملفات <span class="path">.jpg</span> التي تزيد عن 1 ميجا في مجلد الصور.</li>
+                    <li>استخدم <code>find</code> لنسخ جميع ملفات <span class="path">.txt</span> من شجرة مجلدات إلى مجلد وجهة واحد.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l34">
+            <h3>الدرس 34: أدوات متقدمة لمراقبة الأداء وتحليل النظام (strace, lsof, iostat, vmstat)</h3>
+            <ul>
+                <li><strong>lsof</strong> (list open files): كل شيء ملف، لذا يظهر الملفات المفتوحة والمآخذ.</li>
+            </ul>
+            <pre><code>lsof -p PID
+            lsof -i :80            # ما يستخدم المنفذ 80</code></pre>
+            <ul>
+                <li><code>strace -p PID</code> لتتبع استدعاءات النظام لعملية عاملة (مفيد جداً للتصحيح).</li>
+                <li><code>vmstat 1</code> لإحصائيات الذاكرة والـ CPU.</li>
+                <li><code>iostat -x 1</code> لإحصائيات القرص (يحتاج sysstat).</li>
+            </ul>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>ابدأ عملية Python بسيطة، ابحث عن PID الخاص بها، وشاهد الملفات المفتوحة باستخدام <code>lsof</code>.</li>
+                    <li>استخدم <code>strace</code> على أمر <code>ls</code> وشاهد الاستدعاءات.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l35">
+            <h3>الدرس 35: التعامل مع الحاويات من سطر الأوامر – Docker Compose (إضافي)</h3>
+            <p>ملف <span class="path">docker-compose.yml</span>:</p>
+            <pre><code>version: '3'
+                services:
+                  web:
+                    build: .
+                    ports:
+                      - "5000:5000"
+                    volumes:
+                      - .:/app
+                  redis:
+                image: "redis:alpine"</code></pre>
+            <p>أوامر:</p>
+            <pre><code>docker-compose up -d
+                docker-compose logs -f
+            docker-compose down</code></pre>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>أعد مشروع ويب بسيط مع Redis و Flask، استخدم <code>docker-compose</code>.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l36">
+            <h3>الدرس 36: كتابة سكريبتات إنتاجية قوية (Advanced Shell Scripting)</h3>
+            <p>التعامل مع الإشارات (trap):</p>
+            <pre><code>trap 'echo "Interrupted"; exit 1' INT</code></pre>
+            <p>معالجة الخيارات باستخدام <code>getopts</code>:</p>
+            <pre><code>while getopts "f:o:" opt; do
+                  case $opt in
+                    f) input_file=$OPTARG ;;
+                    o) output_file=$OPTARG ;;
+                  esac
+            done</code></pre>
+            <p>الأوامر الشرطية <code>&&</code> و <code>||</code>:</p>
+            <pre><code>mkdir new_dir && cd new_dir || echo "Failed"</code></pre>
+            <p>التحقق من نجاح الأوامر واستخدام <code>set -e</code> (الخروج عند الخطأ)، <code>set -u</code> (خطأ عند متغير غير معرف)، <code>set -o pipefail</code> (خطأ إذا فشل أي جزء في الأنبوب).</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>اكتب سكريبت يأخذ مسار إدخال ومجلد إخراج كخيارات، يعالج جميع ملفات CSV بالإدخال وينتج ملخصاً.</li>
+                    <li>اكتب سكريبتاً به <code>trap</code> لتنظيف ملفات مؤقتة عند الخروج.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l37">
+            <h3>الدرس 37: إدارة العمليات المتوازية (GNU parallel)</h3>
+            <p>أداة <code>parallel</code> لتشغيل أوامر متوازية.</p>
+            <pre><code>seq 10 | parallel echo "Number {}"
+                find . -name "*.jpg" | parallel convert {} {.}.png   # تحويل الصور دفعة
+            parallel -j 4 gzip ::: *.log                          # ضغط بأربع مهام متوازية</code></pre>
+            <p>مفيد في معالجة بيانات كبيرة بسرعة.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>قم بتنزيل قائمة URLs، واستخدم <code>parallel</code> لتنزيلها بالتوازي باستخدام <code>wget</code>.</li>
+                    <li>استخدم <code>parallel</code> لتطبيق <code>jq</code> على العديد من ملفات JSON.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l38">
+            <h3>الدرس 38: استخدام متقدم لـ awk</h3>
+            <p>لنفترض ملف <span class="path">server.log</span> به أعمدة: IP, time, status, size.</p>
+            <pre><code>awk '{sum[$1] += $4} END {for (ip in sum) print ip, sum[ip]}' log.txt</code></pre>
+            <p>تجميع وإحصائيات مباشرة، بديل لـ SQL البسيطة.</p>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>على ملف سجلات وهمي، استخدم <code>awk</code> لحساب عدد الطلبات لكل عنوان IP وحجم البيانات المنقولة.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l39">
+            <h3>الدرس 39: إعداد بيئة تطوير متكاملة في الطرفية (Vim/Tmux + أدوات)</h3>
+            <ul>
+                <li>استخدم <strong>fzf</strong> للبحث التفاعلي عن الملفات والتاريخ.</li>
+                <li><strong>ripgrep (rg)</strong> للبحث النصي فائق السرعة.</li>
+                <li><strong>bat</strong> بديل cat مع تلوين للصيغ.</li>
+                <li><strong>delta</strong> لعرض diffs جميلة.</li>
+                <li>كلها يمكن دمجها لصنع IDE طرفي.</li>
+            </ul>
+            <div class="exercise-box">
+                <h4>🏋️ التمرين</h4>
+                <ol>
+                    <li>ثبت <code>fzf</code> واستخدم <kbd>CTRL-T</kbd> للبحث عن ملفات.</li>
+                    <li>استخدم <code>rg</code> للبحث عن كل استدعاءات دالة معينة في مشروع كبير.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="l40">
+            <h3>الدرس 40: مشاريع نهائية تطبيقية</h3>
+            <p>لتجمع كل المهارات، أنجز المشاريع التالية من سطر الأوامر فقط (بأقل استخدام لـ GUI):</p>
+
+            <h4>المشروع 1: خط أنابيب بيانات (Data Pipeline) بالكامل في Bash</h4>
+            <ul>
+                <li>قم بتنزيل ملف CSV من الإنترنت باستخدام <code>curl</code> أو <code>wget</code>.</li>
+                <li>نظفه باستخدام <code>awk</code> / <code>sed</code> (إزالة أعمدة، استبدال قيم).</li>
+                <li>قسمه إلى ملفات صغيرة حسب قيمة حقل معين (باستخدام <code>awk</code> و <code>sort</code>).</li>
+                <li>احسب إحصائيات وصفية باستخدام <code>csvstat</code> أو <code>awk</code>.</li>
+                <li>أنشئ أرشيفاً بالمخرجات وأرسله إلى خدمة تخزين (مثلاً تحميله إلى خادم SFTP بواسطة <code>scp</code>).</li>
+                <li>جدول العملية بـ <code>cron</code>.</li>
+            </ul>
+
+            <h4>المشروع 2: إدارة تجارب تعلم آلي</h4>
+            <ul>
+                <li>اكتب Makefile لتحميل البيانات، معالجتها، تدريب نموذج، وتقييمه.</li>
+                <li>اكتب سكريبت <span class="path">run_experiments.sh</span> يأخذ ملف hyperparameters (CSV) ويشغل التدريب لكل صف، مع تسجيل المخرجات في مجلدات مؤرخة.</li>
+                <li>استخدم <code>nvidia-smi</code> لمراقبة وإيقاف التدريب إذا تجاوزت حرارة GPU حداً معيناً.</li>
+                <li>أرسل إشعاراً عند الانتهاء (باستخدام <code>curl</code> لـ Telegram Bot أو mail).</li>
+                <li>شغل كل شيء داخل حاوية Docker باستخدام <code>docker-compose</code>.</li>
+            </ul>
+
+            <h4>المشروع 3: أتمتة بيئة تطوير محمولة</h4>
+            <ul>
+                <li>اكتب سكريبت <span class="path">setup.sh</span> يثبت كل أدواتك المفضلة (git, vim, tmux, fzf, oh-my-zsh...) ويستنسخ dotfiles من مستودع Git.</li>
+                <li>استخدم <code>stow</code> لإدارة dotfiles.</li>
+                <li>يجب أن يعمل السكريبت على توزيعة جديدة ويجعل البيئة جاهزة للعمل.</li>
+            </ul>
+        </section>
+
+        <!-- ==================== CONCLUSION ==================== -->
+        <section id="conclusion">
+            <h2>🎓 خاتمة</h2>
+            <p>بإتمامك هذه المستويات والتمارين، ستكون قادراً على استخدام سطر أوامر لينكس بكفاءة عالية جداً في مجال هندسة البرمجيات والذكاء الاصطناعي. تذكر أن <strong>الممارسة هي المفتاح</strong>: حاول كلما واجهت مهمة متكررة أن تؤتمتها بسكريبت Bash، وتعود على إنجاز كل شيء من الطرفية. أتمنى لك رحلة موفقة نحو الاحتراف.</p>
+            <div class="note-box">
+                <strong>📚 المرجع المستمر:</strong> استخدم <code>man command</code> و <code>command --help</code> وابحث دوماً عن المزيد. هذه العقلية هي جوهر الاحتراف.
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SMOOTH SCROLL & ACTIVE LINK HIGHLIGHT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarLinks = document.querySelectorAll('.sidebar a');
+            const sections = document.querySelectorAll('section[id]');
+
+            // Highlight active link on scroll
+            window.addEventListener('scroll', function() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    if (window.scrollY >= sectionTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Smooth scroll for sidebar links
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
